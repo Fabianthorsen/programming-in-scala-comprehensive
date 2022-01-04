@@ -12,5 +12,5 @@ object LongLines {
 
     val source = Source.fromFile(filename)
     for (line <- source.getLines())
-      processLine(filename, width, line)
+      processLine(line)
 }
