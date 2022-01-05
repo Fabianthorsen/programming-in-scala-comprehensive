@@ -32,20 +32,43 @@ class SlowHeadQueue[T](smele: List[T]) { // Not efficient
 // contents of the queue are now leading ::: trailing.reverse
 // Now to append we just cons :: and thus enqueue will be constant time
 
-class Queue[T](
-  private val leading: List[T],
-  private val trailing: List[T]
-) {
-  // The larger the queue, the less mirror will be called
-  private def mirror =
-    if (leading.isEmpty) new Queue(trailing.reverse, Nil)
-    else this
-
-  def head = mirror.leading.head
-  def tail = {
-    val q = mirror
-    new Queue(q.leading.tail, q.trailing)
-  }
-  def enqueue(x: T) = new Queue(leading, x :: trailing)
+trait Queue[T]{
+  def head: T
+  def tail: Queue[T]
+  def enqueue(x: T): Queue[T]
 }
 
+object Queue {
+  // Construct a queue with initial elemets xs
+  def apply[T](xs: T*) = new Queue(xs.toList, Nil)
+
+  // Have rest of implementation here to hide rest
+  // of class implementation
+  private class QueueImpl[T](
+    private val leading: List[T],
+    private val trailing: List[T]
+  ) extends Queue[T] {
+    // The larger the queue, the less mirror will be called
+      private def mirror =
+        if (leading.isEmpty) new QueueImpl(trailing.reverse, Nil)
+        else this
+
+      // T* means that the parameter is repeated
+      // def this(elems: T*) = this(elems.toList, Nil) // Auxiliary constructor
+      // rather make a companion object and a factory method
+
+      def head = mirror.leading.head
+      def tail: QueueImpl[T] = {
+        val q = mirror
+        new QueueImpl(q.leading.tail, q.trailing)
+      }
+      def enqueue(x: T) = new QueueImpl(leading, x :: trailing)
+  }
+  // trying to use Queue as a type wont work since it is a
+  // trait, but Queue[String] is a type
+
+  // Queue[+T] would mean that subtyping is covariant
+  // Queue[-T] would mean that subtyping is contravariant
+  // A lot of covariant in functional world, but not mutable world
+
+}
