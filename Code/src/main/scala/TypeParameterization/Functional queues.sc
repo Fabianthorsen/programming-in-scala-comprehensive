@@ -40,7 +40,7 @@ trait Queue[T]{
 
 object Queue {
   // Construct a queue with initial elemets xs
-  def apply[T](xs: T*) = new Queue(xs.toList, Nil)
+  def apply[T](xs: T*): Queue[T] = new QueueImpl[T](xs.toList, Nil)
 
   // Have rest of implementation here to hide rest
   // of class implementation
@@ -70,5 +70,7 @@ object Queue {
   // Queue[+T] would mean that subtyping is covariant
   // Queue[-T] would mean that subtyping is contravariant
   // A lot of covariant in functional world, but not mutable world
-
 }
+
+// Can engineer an unsound situation even when there is not re-assignment
+
